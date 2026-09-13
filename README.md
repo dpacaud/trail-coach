@@ -58,6 +58,28 @@ python scripts/analyze_session.py cotes_raides.fit --efforts --cadence-threshold
 python scripts/analyze_session.py sortie_longue.fit --splits
 ```
 
+Initialiser un athlète depuis son export RGPD Garmin Connect (Paramètres du
+compte > Exporter vos données, puis dézipper) :
+
+```bash
+python scripts/garmin_import.py ~/Downloads/<export_dezippe> --athlete prenom
+```
+
+Le script écrit dans `data/<athlete>/` :
+
+- `activities.csv` : une ligne par activité (distance, D+, allure, allure
+  ajustée à la pente, FC, temps par zone, dynamique de course, charge,
+  Training Effect, RPE). Aucune coordonnée GPS.
+- `daily.csv` : une ligne par jour, sans trou. FC repos, stress, Body Battery,
+  sommeil (nuit précédant la date), Training Readiness, HRV hebdo, charge
+  aiguë/chronique, VO2max, et volume couru du jour.
+- `profile.json` : FC max observée et FC max Garmin, LTHR, FC repos, volume
+  récent. Le script propose les lignes `.env` correspondantes.
+
+Les unités des JSON Garmin sont piégeuses (centimètres, millisecondes, vitesses
+divisées par 10) : elles sont documentées en tête de
+[`trailcoach/garmin_export.py`](trailcoach/garmin_export.py).
+
 En bibliothèque :
 
 ```python
@@ -74,6 +96,13 @@ print(zone_distribution(sess.samples, ath.hr_max))
 print(hr_drift(sess.samples).pct)
 for e in detect_efforts(sess.samples):         # borne sur la cadence, pas la vitesse
     print(e.duration_s, e.cadence)
+```
+
+## Tests
+
+```bash
+uv pip install -e ".[dev]"
+python -m pytest
 ```
 
 ## Pourquoi lire le FIT et pas seulement Strava

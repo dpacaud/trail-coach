@@ -20,6 +20,9 @@ activities_*.json
 summary.csv
 detailed.json
 activities.csv
+daily.csv
+profile.json
+DI_CONNECT/
 
 # Python
 .venv/
