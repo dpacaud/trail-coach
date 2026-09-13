@@ -1,0 +1,21 @@
+# Secrets et jetons
+.env
+*.tokens.json
+.strava_tokens.json
+
+# Donnees personnelles : ne JAMAIS versionner
+data/
+export/
+*.fit
+*.gz
+*.tcx
+summary.csv
+detailed.json
+activities.csv
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
