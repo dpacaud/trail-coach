@@ -85,6 +85,11 @@ def hr_drift(samples: list[Sample]) -> Drift | None:
     )
 
 
+def _keep(span, lo: int, hi: int | None) -> bool:
+    d = span[1] - span[0]
+    return d >= lo and (hi is None or d <= hi)
+
+
 @dataclass
 class Effort:
     start_s: int
@@ -101,8 +106,10 @@ class Effort:
 
 def detect_efforts(
     samples: list[Sample],
-    cadence_threshold: float = 150,
-    min_duration_s: int = 15,
+    cadence_threshold: float | None = None,
+    min_duration_s: int = 12,
+    max_duration_s: int | None = 180,
+    margin: float = 8.0,
 ) -> list[Effort]:
     """Detecte les repetitions d'une seance d'intervalles.
 
@@ -116,7 +123,25 @@ def detect_efforts(
 
     Sur une seance reelle de 6 x 45 s, la detection par puissance donnait
     30 a 39 s, la detection par cadence 46 a 51 s. Seule la seconde etait juste.
+
+    Le seuil est RELATIF par defaut : mediane de la cadence en course + `margin`.
+    Un seuil absolu se trompe des que la cadence de footing de l'athlete depasse
+    la valeur choisie : a 165 pas/min en footing, un seuil a 150 classe
+    l'echauffement entier comme un effort.
+
+    `max_duration_s` ecarte les blocs continus (echauffement, retour au calme)
+    qui passeraient le seuil. Le mettre a None pour detecter des efforts longs.
+
+    Limite connue : sur des cotes raides ou la cadence reste basse pendant
+    l'effort, l'ecart avec le footing se resserre. Passer alors un
+    `cadence_threshold` absolu, ou borner les efforts autrement.
     """
+    if cadence_threshold is None:
+        run = [s.cadence for s in samples
+               if s.cadence and s.cadence > 140 and s.speed and s.speed > 1.5]
+        if not run:
+            return []
+        cadence_threshold = st.median(run) + margin
     efforts: list[Effort] = []
     cur: list[int] | None = None
     for s in samples:
@@ -126,10 +151,10 @@ def detect_efforts(
             else:
                 cur[1] = s.t
         else:
-            if cur and cur[1] - cur[0] >= min_duration_s:
+            if cur and _keep(cur, min_duration_s, max_duration_s):
                 efforts.append(cur)
             cur = None
-    if cur and cur[1] - cur[0] >= min_duration_s:
+    if cur and _keep(cur, min_duration_s, max_duration_s):
         efforts.append(cur)
 
     out = []
