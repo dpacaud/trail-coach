@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from trailcoach import Athlete, load_dotenv                        # noqa: E402
 from trailcoach import fit as fitmod                               # noqa: E402
 from trailcoach.metrics import (                                   # noqa: E402
-    detect_efforts, fmt_pace, hr_drift, recoveries, splits,
+    detect_efforts, effort_cadence_threshold, fmt_pace, hr_drift, recoveries, splits,
     stride_response, time_below, zone_distribution, zone_edges,
 )
 
@@ -23,6 +23,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("path", help="fichier .fit ou .zip Garmin")
     ap.add_argument("--efforts", action="store_true", help="detecter les repetitions")
+    ap.add_argument("--cadence-threshold", type=float,
+                    help="seuil absolu de cadence (pas/min) pour --efforts, ex. en cote raide")
+    ap.add_argument("--margin", type=float, default=8.0,
+                    help="ecart au-dessus de la mediane de cadence en course (defaut 8)")
     ap.add_argument("--splits", action="store_true", help="detail par kilometre")
     ap.add_argument("--target-hr", type=int, help="consigne de FC moyenne a verifier")
     args = ap.parse_args()
@@ -80,8 +84,14 @@ def main():
                         "la cadence decroche avec l'allure : a corriger"))
 
     if args.efforts:
-        eff = detect_efforts(S)
-        print(f"\n{len(eff)} repetitions detectees (borne = cadence >= 150) :")
+        if args.cadence_threshold:
+            threshold, origin = args.cadence_threshold, "absolu"
+        else:
+            threshold = effort_cadence_threshold(S, args.margin)
+            origin = f"mediane course + {args.margin:g}"
+        eff = detect_efforts(S, cadence_threshold=threshold) if threshold else []
+        borne = f"cadence >= {threshold:.1f}, {origin}" if threshold else "pas de cadence en course"
+        print(f"\n{len(eff)} repetitions detectees (borne = {borne}) :")
         for i, e in enumerate(eff, 1):
             print(f"  {i:2}  a {e.start_s//60:>2}:{e.start_s%60:02d}  {e.duration_s:>3}s  "
                   f"D+ {e.ascent_m:5.1f}m  FCmax {e.hr_max:3d}  "

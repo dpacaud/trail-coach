@@ -3,6 +3,7 @@ name = "trailcoach"
 version = "0.1.0"
 description = "Lecture Strava et Garmin FIT, et methode de construction d'un plan de preparation trail"
 requires-python = ">=3.11"
+license = { file = "LICENSE" }
 dependencies = [
     "pandas>=2.0",
     "fitparse>=1.2",

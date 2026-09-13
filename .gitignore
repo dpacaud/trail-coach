@@ -1,12 +1,20 @@
 # Secrets et jetons
 .env
-*.tokens.json
-.strava_tokens.json
+.env.*
+!.env.example
+strava_tokens.json
+*tokens*.json
 
 # Donnees personnelles : ne JAMAIS versionner
+# (y compris si TRAILCOACH_DATA_DIR pointe dans le repo)
 data/
 export/
+streams/
+activities_*.json
 *.fit
+*.FIT
+*.gpx
+*.zip
 *.gz
 *.tcx
 summary.csv
@@ -19,3 +27,6 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 *.egg-info/
+
+# macOS
+.DS_Store

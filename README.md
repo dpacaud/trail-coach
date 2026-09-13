@@ -54,6 +54,7 @@ Garmin Connect :
 ```bash
 python scripts/analyze_session.py seance.zip --target-hr 150
 python scripts/analyze_session.py seance_de_cotes.fit --efforts
+python scripts/analyze_session.py cotes_raides.fit --efforts --cadence-threshold 155
 python scripts/analyze_session.py sortie_longue.fit --splits
 ```
 
@@ -99,4 +100,4 @@ raccourcir la foulée sans baisser la cadence quand on ralentit.
 
 ## Licence
 
-MIT.
+MIT, voir [LICENSE](LICENSE).

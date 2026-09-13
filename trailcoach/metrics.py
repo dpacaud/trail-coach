@@ -104,6 +104,13 @@ class Effort:
         return self.end_s - self.start_s + 1
 
 
+def effort_cadence_threshold(samples: list[Sample], margin: float = 8.0) -> float | None:
+    """Seuil relatif de detection des efforts : mediane de la cadence en course + `margin`."""
+    run = [s.cadence for s in samples
+           if s.cadence and s.cadence > 140 and s.speed and s.speed > 1.5]
+    return st.median(run) + margin if run else None
+
+
 def detect_efforts(
     samples: list[Sample],
     cadence_threshold: float | None = None,
@@ -137,11 +144,9 @@ def detect_efforts(
     `cadence_threshold` absolu, ou borner les efforts autrement.
     """
     if cadence_threshold is None:
-        run = [s.cadence for s in samples
-               if s.cadence and s.cadence > 140 and s.speed and s.speed > 1.5]
-        if not run:
+        cadence_threshold = effort_cadence_threshold(samples, margin)
+        if cadence_threshold is None:
             return []
-        cadence_threshold = st.median(run) + margin
     efforts: list[Effort] = []
     cur: list[int] | None = None
     for s in samples:
