@@ -22,7 +22,7 @@ Pieges des JSON de l'export, verifies sur un export reel :
 | `sleepData.calendarDate` | date du REVEIL : la nuit precedant ce jour |
 | `sleepData` sans phases ou `OFF_WRIST` | pas une mesure : fenetre par defaut (10 h) ou montre non portee |
 | `hrvWeeklyAverage` = 511 | valeur sentinelle "pas de donnee", pas une HRV |
-| `currentDayRestingHeartRate` | artefacts (105 quand `restingHeartRate` donne 71) : preferer ce dernier |
+| `currentDayRestingHeartRate` | artefacts (valeurs aberrantes la ou `restingHeartRate` reste coherent) : preferer ce dernier |
 
 Plusieurs fichiers de metriques ont plusieurs lignes par jour (readiness
 recalculee apres chaque seance, charge mise a jour en continu). On garde la

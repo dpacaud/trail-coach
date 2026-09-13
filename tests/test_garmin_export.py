@@ -51,7 +51,7 @@ def export(tmp_path):
                       startTimeGmt=MS_2026_05_03 + 30 * H, maxHr=120.0),
         ]}])
     _write(tmp_path, "DI-Connect-Aggregator/UDSFile_a.json", [
-        {"calendarDate": "2026-05-03", "restingHeartRate": 55, "currentDayRestingHeartRate": 105,
+        {"calendarDate": "2026-05-03", "restingHeartRate": 55, "currentDayRestingHeartRate": 99,
          "allDayStress": {"aggregatorList": [{"type": "TOTAL", "averageStressLevel": 20}]},
          "bodyBattery": {"bodyBatteryStatList": [
              {"bodyBatteryStatType": "HIGHEST", "statsValue": 90}]}},
@@ -116,7 +116,7 @@ def test_daily_one_row_per_calendar_day(export):
 def test_daily_health_traps(export):
     daily = export.daily()
     d3, d5 = daily.loc[date(2026, 5, 3)], daily.loc[date(2026, 5, 5)]
-    assert d3["resting_hr"] == 55                 # pas l'artefact 105
+    assert d3["resting_hr"] == 55                 # pas l'artefact 99
     assert d5["resting_hr"] == 58                 # doublon : la derniere lue
     assert math.isnan(d5["stress_avg"])           # -1 = pas assez mesure
     assert d3["body_battery_high"] == 90
