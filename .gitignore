@@ -21,6 +21,8 @@ summary.csv
 detailed.json
 activities.csv
 daily.csv
+correlations.csv
+session_context.csv
 profile.json
 DI_CONNECT/
 

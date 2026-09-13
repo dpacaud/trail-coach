@@ -76,6 +76,21 @@ Le script écrit dans `data/<athlete>/` :
 - `profile.json` : FC max observée et FC max Garmin, LTHR, FC repos, volume
   récent. Le script propose les lignes `.env` correspondantes.
 
+Puis croiser charge d'entraînement et marqueurs de santé :
+
+```bash
+python scripts/health_report.py --athlete prenom
+```
+
+Le rapport sort : la charge du jour contre FC repos, stress, Body Battery,
+sommeil et Readiness de J à J+3 ; les marqueurs du lendemain par tranche
+d'ACWR ; l'état avant une sortie contre son efficacité aérobie (mètres par
+battement) ; la tendance mensuelle. Les précautions statistiques (écart à la
+référence, autocorrélation, tests multiples, alternance sortie / repos,
+indicateurs Garmin circulaires) sont décrites en tête de
+[`trailcoach/health.py`](trailcoach/health.py). Ce sont des associations sur un
+seul athlète, pas des causes.
+
 Les unités des JSON Garmin sont piégeuses (centimètres, millisecondes, vitesses
 divisées par 10) : elles sont documentées en tête de
 [`trailcoach/garmin_export.py`](trailcoach/garmin_export.py).
