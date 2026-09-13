@@ -18,6 +18,7 @@ Conventions Garmin a connaitre, chacune est un piege :
 """
 from __future__ import annotations
 
+import io
 import zipfile
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -104,10 +105,13 @@ def load(path: str | Path, tz: str = "Europe/Paris") -> Session:
     """Charge un .fit (ou un .zip qui en contient un) en Session normalisee."""
     path = Path(path)
     if path.suffix.lower() == ".zip":
+        # FitFile ne lit que l'en-tete a l'ouverture, les messages a la demande :
+        # on charge le FIT en memoire, un handle de zip serait deja ferme
         with zipfile.ZipFile(path) as z:
-            name = next(n for n in z.namelist() if n.lower().endswith(".fit"))
-            with z.open(name) as fh:
-                fit = FitFile(fh)
+            name = next((n for n in z.namelist() if n.lower().endswith(".fit")), None)
+            if name is None:
+                raise FileNotFoundError(f"aucun fichier .fit dans {path}")
+            fit = FitFile(io.BytesIO(z.read(name)))
     else:
         fit = FitFile(str(path))
 
